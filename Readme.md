@@ -1,0 +1,1 @@
+This project is used as a beginner phase project that will contribute to my Backend Engineering journey as the first hurdle crossed. Though This is not the first time I will build something like this.
