@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Depends,HTTPException,status , Request
+from fastapi import FastAPI,Depends,HTTPException,status,Request,Query
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import JSONResponse
@@ -41,7 +41,7 @@ async def validation_exc_handler(request:Request,exc:RequestValidationError):
     field='.'.join(str(p) for p in first["loc"] if p!= "body")
     return JSONResponse(
         status_code=422,
-        content={"error":{"code":422,"message":f"{field}:{first["msg"]}"}}
+        content={"error":{"code":422,"message":f"{field}:{first['msg']}"}}
     )
 @app.exception_handler(Exception)
 async def unhandled_exc_handler(request:Request,exc:Exception):
@@ -86,9 +86,9 @@ def create_ticket(ticket:TicketCreate,db:Session=Depends(get_db)):
     db.refresh(new_ticket)
     return new_ticket
 
-@app.get("/tickets",response_model=list[TicketResponse])
-def get_all_tickets(skip:int=0,limit:int=50,db:Session=Depends(get_db)):
-    return db.query(Ticket).offset(skip).limit(limit).all()
+@app.get("/tickets",response_model=TicketListResponse)
+def get_all_tickets(ticket_status:Ticket_status=Ticket_status.active,priority:Priorities=Priorities.high,page:int=Query(1,ge=1),page_size:int=Query(10,ge=5,le=100),db:Session=Depends(get_db)):
+    return {"count":db.query(Ticket).count(),"tickets":db.query(Ticket).where(Ticket.status==ticket_status and Ticket.priority==priority).order_by(Ticket.id).offset((page-1)*page_size).limit(page_size).all()}
 
 @app.get("/tickets/{id}",response_model=TicketResponse)
 def ticket_with_id(id:int,db:Session=Depends(get_db)):

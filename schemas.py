@@ -1,6 +1,7 @@
 from pydantic import BaseModel,EmailStr,Field , ConfigDict ,field_validator
 from models import Roles,Ticket_status,Order_status,Priorities
 from typing import Optional
+from datetime import datetime
 
 class UserCreate(BaseModel):
     name:str
@@ -28,7 +29,11 @@ class TicketResponse(BaseModel):
     status:Ticket_status
     priority:Priorities
     owner_id:int
+    created_at:datetime
 
+class TicketListResponse(BaseModel):
+    count: int
+    tickets: list[TicketResponse]
 class TicketUpdate(BaseModel):
     title: str =Field(min_length=3,max_length=120)
     description: str | None = None
@@ -57,3 +62,4 @@ class OrderResponse(BaseModel):
     item:str
     amount:float
     status:Order_status
+    created_at:datetime
