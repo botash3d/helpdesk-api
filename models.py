@@ -45,6 +45,7 @@ class Ticket(Base):
     priority = Column(ENUM(Priorities,name="ticket_priority"),default=Priorities.medium,nullable=False)
     owner_id = Column(Integer,ForeignKey("users.id",ondelete="CASCADE"),nullable=False)
     created_at = Column(DateTime(timezone=True),server_default=func.now(),nullable=False)
+    updated_at = Column(DateTime(timezone=True),server_default=func.now(),onupdate=func.now(),nullable=False)
     
     owner = relationship("User",back_populates="tickets")
 
